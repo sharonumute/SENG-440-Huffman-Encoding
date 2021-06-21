@@ -5,7 +5,7 @@
 
 #include "../include/huffman_encode.h"
 
-char** encode_word(int target){
+char** encode_letter(int target){
     char ** encoded= malloc(130 * sizeof(char*));
     for (size_t i = 0; i < target; i++)
     {
@@ -45,7 +45,7 @@ int main() {
 
     printf("sum: %1.100Lf\n", sum_of_p);
 
-    printf("%s\n", encode_word(127));
+    printf("%s\n", encode_letter(127));
     printf("%s\n", decode_sentence("0101100"));
     return 0;
 }
