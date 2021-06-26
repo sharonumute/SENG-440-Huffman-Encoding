@@ -1,21 +1,23 @@
+#include <algorithm>
+#include <functional>
+#include <iostream>
+#include <string_view>
+#include <vector>
 
-#include <stdio.h>
+#include "../include/huffman_encode.h"
 
-int main() {
-    int i;
+int main(int argc, char * argv []) {
+    std::array<char, ALPHABET_SIZE> alpha; 
 
-    long double p = 0.5;
+	for(int i=0; i<ALPHABET_SIZE; ++i) {
+		alpha[i] = ALPHABET[i]; 
+	}
 
+    std::make_heap(alpha.begin(), alpha.end(), std::greater<>{});
 
-    printf("const long double ALPHABET = {");
-    for(i=0; i<127; ++i) {
-        if(!(i%10)) printf("\n");
-        printf("%03d,", i);
-        //printf("\t%1.100LfL,\n", p);
-        //p *= 0.5;
+    for(int i=0; i<ALPHABET_SIZE; ++i) {
+        std::cout << (int)alpha[i] << std::endl;
     }
-    //printf("\t%1.100LfL\n", p);
-    printf("03%d", i);
-    printf("};");
 
+    return 0;
 }
