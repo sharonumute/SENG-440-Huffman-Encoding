@@ -5,13 +5,6 @@
 
 #include "../include/huffman_encode.h"
 
-char decode_char (char in_char_code[], size_t in_code_len) {
-    if(in_char_code[in_code_len-1] == '1') {
-        return (char)(in_code_len + 1);
-    }
-    return (char)(in_code_len-1);
-}
-
 //Returns number of characters in encoding (not including null termination)
 int encode_string(char string[], int string_len, char out_buf[], int out_buf_len) {
     int written_len = 0;
