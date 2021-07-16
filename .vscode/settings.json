@@ -1,5 +1,6 @@
 {
     "files.associations": {
         "huffman_encode.h": "c"
-    }
+    },
+    "editor.formatOnSave": true
 }
