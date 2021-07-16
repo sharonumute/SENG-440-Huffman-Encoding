@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.10)
 
 # set the project name
-project(huffman_encode)
+project(huffman_code)
 
 # add the executable
-add_executable(hufman_encode app/huffman_encode.c)
+add_executable(huffman_code src/huffman_code.c)

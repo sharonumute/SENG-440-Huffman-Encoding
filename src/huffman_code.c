@@ -59,7 +59,7 @@ int encode_string(char string[], int string_len, char out_buf[], int out_buf_len
 //Decode a string encoded in binary
 int decode_string(char encoded_string[], int encoded_string_len, char out_buf[], int out_buf_len) {
     int i;
-    for(i=0; i<encoded_string_len)
+    for(i=0; i<encoded_string_len;);
 }
 
 int main() {
