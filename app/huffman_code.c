@@ -1,8 +1,8 @@
 #include "../include/huffman_code.h"
 
-// Alphabet (encoded in ASCII)
-//Array corresponding to numbers of 1s in encoding 
-const char ALPHABET[ALPHABET_SIZE] = {
+// Alphabet 
+// from most probable to least
+const char DECODE_TABLE[ALPHABET_SIZE] = {
     23, 113, 96, 73, 1, 82, 54, 93, 37, 116, 88, 
     39, 6, 55, 46, 7, 19, 49, 66, 64, 104, 45, 21, 
     120, 20, 61, 76, 106, 102, 81, 34, 62, 14, 99, 
@@ -17,8 +17,8 @@ const char ALPHABET[ALPHABET_SIZE] = {
     31, 109, 56, 110
 };
 
-
-const char LETTER_ORDER[ALPHABET_SIZE] = {
+//Alphabet ordered by probability of occurence of each value
+const char ENCODE_TABLE[ALPHABET_SIZE] = {
     114, 4, 80, 61, 47, 73, 12, 15, 88, 54, 97, 
     95, 46, 50, 32, 94, 107, 39, 60, 16, 24, 22, 
     34, 0, 57, 51, 83, 42, 55, 121, 118, 124, 48, 
@@ -78,19 +78,19 @@ unsigned long long int encode_string(char string[],
     register int num_1s = 0;
     register int bit_pos = 0;
     register int byte=0;
-    
-    printf("String: %s\n",string);
+
 
     size_t i;
     for(i=0; i<string_len; ++i) {
-        num_1s = LETTER_ORDER[(int)string[i]];
+        num_1s = ENCODE_TABLE[(int)string[i]];
 
         //Check if there is room to write
-        if (ceil_divide(bits_written + num_1s+1, BYTE_SIZE) > out_buf_len) {
+        if (ceil_divide(bits_written + num_1s + 1, BYTE_SIZE) > out_buf_len) {
             return 0;
         }
 
         int j;
+        
         for(j=0; j<num_1s; j++) {
             bit_pos = 7 - (bits_written + j) % BYTE_SIZE;
 
@@ -98,6 +98,7 @@ unsigned long long int encode_string(char string[],
 
             if(bit_pos == 0) {
                 ++byte;
+                out_buf[byte] = 0;
             }
         }
 
@@ -107,6 +108,7 @@ unsigned long long int encode_string(char string[],
 
         if(bit_pos == 0) {
             ++byte;
+            out_buf[byte] = 0;
         }
 
         bits_written += num_1s+1;
@@ -138,22 +140,22 @@ unsigned long long int encode_string(char string[],
  */
 long long int decode_string(int encoded_string[], register unsigned long long int num_encoded_bits, 
     char out_buf[], register unsigned int out_buf_len) {
-    register unsigned int k = 0;
+    register unsigned int k = 0; //Loop iterator
     register unsigned int num_1s = 0;
-    register unsigned int byte;
+    register unsigned int byte ;
     register unsigned int i;
 
     register int num_full_bytes_encoded = (num_encoded_bits/BYTE_SIZE);
 
-    for (i = 0; i < num_full_bytes_encoded; ++i) {
-        byte = (unsigned int)encoded_string[i];
+    for (i = 0; i < num_encoded_bits - BYTE_SIZE; i+=BYTE_SIZE) {
+        byte = (unsigned int)encoded_string[i/BYTE_SIZE];
 
         if(byte&0x80) {
             ++num_1s;
         }else {
             if(k == out_buf_len-1) return -1;
-            out_buf[k] = ALPHABET[num_1s];
-            ++byte;
+            out_buf[k] = DECODE_TABLE[num_1s];
+            ++k;
             num_1s ^= num_1s;
         }
 
@@ -161,17 +163,17 @@ long long int decode_string(int encoded_string[], register unsigned long long in
             ++num_1s;
         }else{
             if(k == out_buf_len-1) return -1;
-            out_buf[k] = ALPHABET[num_1s];
-            ++byte;
-            num_1s ^= num_1s;
+            out_buf[k] = DECODE_TABLE[num_1s];
+            ++k;
+           num_1s ^= num_1s;
         }
 
         if(byte&0x20) {
             ++num_1s;
         }else{
             if(k == out_buf_len-1) return -1;
-            out_buf[k] = ALPHABET[num_1s];
-            ++byte;
+            out_buf[k] = DECODE_TABLE[num_1s];
+            ++k;
             num_1s ^= num_1s;
         }
 
@@ -179,8 +181,8 @@ long long int decode_string(int encoded_string[], register unsigned long long in
             ++num_1s;
         }else{
             if(k == out_buf_len-1) return -1;
-            out_buf[k] = ALPHABET[num_1s];
-            ++byte;
+            out_buf[k] = DECODE_TABLE[num_1s];
+            ++k;
             num_1s ^= num_1s;
         }
 
@@ -188,8 +190,8 @@ long long int decode_string(int encoded_string[], register unsigned long long in
             ++num_1s;
         }else {
             if(k == out_buf_len-1) return -1;
-            out_buf[k] = ALPHABET[num_1s];
-            ++byte;
+            out_buf[k] = DECODE_TABLE[num_1s];
+            ++k;
             num_1s ^= num_1s;
         }
 
@@ -197,8 +199,8 @@ long long int decode_string(int encoded_string[], register unsigned long long in
             ++num_1s;
         }else{
             if(k == out_buf_len-1) return -1;
-            out_buf[k] = ALPHABET[num_1s];
-            ++byte;
+            out_buf[k] = DECODE_TABLE[num_1s];
+            ++k;
             num_1s ^= num_1s;
         }
 
@@ -206,8 +208,8 @@ long long int decode_string(int encoded_string[], register unsigned long long in
             ++num_1s;
         }else{
             if(k == out_buf_len-1) return -1;
-            out_buf[k] = ALPHABET[num_1s];
-            ++byte;
+            out_buf[k] = DECODE_TABLE[num_1s];
+            ++k;
             num_1s ^= num_1s;
         }
 
@@ -215,27 +217,30 @@ long long int decode_string(int encoded_string[], register unsigned long long in
             ++num_1s;
         }else{
             if(k == out_buf_len-1) return -1;
-            out_buf[k] = ALPHABET[num_1s];
-            ++byte;
+            out_buf[k] = DECODE_TABLE[num_1s];
+            ++k;
             num_1s ^= num_1s;
         }
     }
 
     byte = encoded_string[num_encoded_bits/BYTE_SIZE];
-
-    printf("num_encoded_bits\%BYTE_SIZE: %d\n", num_encoded_bits%BYTE_SIZE);
     
     for(i=(num_encoded_bits%BYTE_SIZE); i; --i) {
-        printf("was here\n");
         if(byte&(1<<i)) {
             ++num_1s;
         } else {
             if(k == out_buf_len-1) return -1;
-            out_buf[k] = ALPHABET[num_1s];
-            ++byte;
-            num_1s ^= num_1s;
+            out_buf[k] = DECODE_TABLE[num_1s];
+            ++k;
+           num_1s ^= num_1s;
         }
     }
+    
+    //Null terminate if there is room
+    if(k != out_buf_len-1) {
+        out_buf[k] = 0;
+        ++k;
+    } 
 
     return k;
 }
