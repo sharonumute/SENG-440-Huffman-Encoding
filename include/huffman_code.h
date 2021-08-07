@@ -24,12 +24,18 @@
 
 #define BYTE_SIZE 8
 
-int ceil_divide(unsigned long int num, unsigned long int den);
+int ceil_divide(int,int);
 
-unsigned long long int encode_string(char string[], 
-    register unsigned int string_len, int out_buf[], register unsigned int out_buf_len);
+unsigned int encode_string(
+    char string[], 
+    register int string_len, 
+    char out_buf[], 
+    register int out_buf_len);
 
-long long int decode_string(int encoded_string[], register unsigned long long int num_encoded_bits, 
-    char out_buf[], register unsigned int out_buf_len);
+int decode_string(
+    char encoded_string[], 
+    register int num_encoded_bits, 
+    char out_buf[], 
+    register int out_buf_len);
 
 #endif
