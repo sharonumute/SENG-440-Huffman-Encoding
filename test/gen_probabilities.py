@@ -1,6 +1,5 @@
 import random
 
-# we specified head and tail of a coin in string
 values = [
     23, 113, 96, 73, 1, 82, 54, 93, 37, 116, 88, 
     39, 6, 55, 46, 7, 19, 49, 66, 64, 104, 45, 21, 
@@ -15,17 +14,19 @@ values = [
     35, 0, 115, 67, 59, 30, 47, 114, 29, 40, 112, 
     31, 109, 56, 110
 ]
-# Execute 3 times to verify we are getting 6 or more heads in every 10 spins
 
 cum_weights = []
 p = 0.5
-cp = 0.5
 for i in range(128):
-    cum_weights.append(cp)
+    cum_weights.append(p)
     p /= 2.0
-    cp += p
 
-    
+size = 2148514
 
-for i in range(3):
-    print(random.choices(values, cum_weights, k=10))
+text = random.choices(values, cum_weights, k=size)
+
+print(size)
+for val in text:
+    print(chr(val), end='')
+
+
