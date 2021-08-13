@@ -26,12 +26,20 @@ $(EXE_DIR)/huffman_code.o: app/huffman_code.c create_tmp_dir
 
 $(EXE_DIR)/huffman_code.s: app/huffman_code.c create_tmp_dir
 	$(CXX) -c app/huffman_code.c -S -o $(EXE_DIR)/huffman_code.s $(OPTIONS)
+<<<<<<< HEAD
 
 $(EXE_DIR)/main.s: create_tmp_dir $(EXE_DIR)/lib_huffman_code.a
 	$(CXX) -c src/main.c -S -o $(EXE_DIR)/main.s $(OPTIONS)
+=======
+>>>>>>> f3ac17e66882aeb86f3aa7b3989eef8a4803c2e3
 
 $(EXE_DIR)/lib_huffman_code.a: $(EXE_DIR)/huffman_code.o create_tmp_dir
 	ar rcs $(EXE_DIR)/lib_huffman_code.a $(EXE_DIR)/huffman_code.o
+
+
+$(EXE_DIR)/main.s: create_tmp_dir $(EXE_DIR)/lib_huffman_code.a
+	$(CXX) -c src/main.c -o $(EXE_DIR)/main.s $(OPTIONS)
+
 
 $(EXE_DIR)/main.o: create_tmp_dir
 	$(CXX) -c src/main.c -o $(EXE_DIR)/main.o $(OPTIONS)
