@@ -1,27 +1,5 @@
 #include "../include/huffman_code.h"
 
-<<<<<<< HEAD
-=======
-
-/**
- * Function: ceil_divide
- * 
- * Description: Returns the ceiling of num/den
- * 
- * Param: (unsgined long int) num: The numerator
- * 
- * Param: (unsigned long int) den: The denominator
- * 
- * Returns: ceil(num/den)
- * 
- */
-int ceil_divide(int num, int den)
-{
-    register int floor = num/den;
-    return floor + (num%den==0);
-    //return !(num%den) ? floor : floor+1;
-}
->>>>>>> f3ac17e66882aeb86f3aa7b3989eef8a4803c2e3
 
 /**
  * Function: encode_string
@@ -39,7 +17,6 @@ int ceil_divide(int num, int den)
  * 
  * Returns: (unsigned long long int) The number of bits written or -1 if there was an error
  */
-<<<<<<< HEAD
 uint32_t encode_string(
     char string[], 
     register uint32_t string_len, 
@@ -48,15 +25,6 @@ uint32_t encode_string(
 {
     //Num 1s for each alphabet character 
     //(represented by the index)
-=======
-unsigned int encode_string(
-    char string[], 
-    register int string_len, 
-    char out_buf[], 
-    register int out_buf_len) 
-{
-    //Alphabet ordered by probability of occurence of each value
->>>>>>> f3ac17e66882aeb86f3aa7b3989eef8a4803c2e3
     const char ENCODE_TABLE[ALPHABET_SIZE] = {
         114, 4, 80, 61, 47, 73, 12, 15, 88, 54, 97, 
         95, 46, 50, 32, 94, 107, 39, 60, 16, 24, 22, 
@@ -72,7 +40,6 @@ unsigned int encode_string(
         90, 100, 70, 40, 72, 41, 84
     };
 
-<<<<<<< HEAD
     register uint32_t bits_written = 0;
     register int32_t num_1s = 0;
     register uint32_t bit_pos = 0;
@@ -94,29 +61,6 @@ unsigned int encode_string(
         //Write ones in each bit
         for(j=0; j < num_1s; j++) {
             bit_pos = 31 - (bits_written + j)%FOUR_BYTES_SIZE;
-=======
-    register int bits_written = 0;
-    register int num_1s = 0;
-    register int bit_pos = 0;
-    register int byte=0; 
-    register int j; //Loop counter
-    register int i; //Loop counter
-
-
-    for(i=0; i<string_len; ++i) {
-        //Get integer representing the number of 1s in the code
-        num_1s = ENCODE_TABLE[(int)string[i]];
-
-        //Check if there is room to write
-        if(ceil_divide(bits_written + num_1s + 1, BYTE_SIZE) >= out_buf_len) {
-            return 0;
-        }
-
-        
-        //Write ones in each bit
-        for(j=0; j<num_1s; j++) {
-            bit_pos = 7 - (bits_written + j)%BYTE_SIZE;
->>>>>>> f3ac17e66882aeb86f3aa7b3989eef8a4803c2e3
 
             out_buf[out_buf_index] += (1 << bit_pos);
 
@@ -126,7 +70,6 @@ unsigned int encode_string(
             }
         }
 
-<<<<<<< HEAD
         if((bits_written + j) % FOUR_BYTES_SIZE == 31) {
             ++out_buf_index;
             out_buf[out_buf_index] = 0;
@@ -134,17 +77,6 @@ unsigned int encode_string(
 
         bits_written += num_1s;
         ++bits_written; //For the zero bit at the end
-=======
-        bit_pos = 7 - (bits_written + j) % BYTE_SIZE;
-
-        if(bit_pos == 0) {
-            ++byte;
-            out_buf[byte] = 0;
-        }
-
-        bits_written += num_1s;
-        ++bits_written; //0
->>>>>>> f3ac17e66882aeb86f3aa7b3989eef8a4803c2e3
     }
     return bits_written;
 }
