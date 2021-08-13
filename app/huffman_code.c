@@ -206,10 +206,6 @@ uint32_t decode_string(
             out_buf_index += !bit_value1;
         }
     }
-    
-    if(num_encoded_bits%BYTE_SIZE == 0) {
-        return out_buf_index;
-    }
 
     //If encoding fits evenly into bytes then return here
     if(num_encoded_bits%FOUR_BYTES_SIZE == 0) {;
