@@ -73,6 +73,8 @@ int run_test_file(char * fpath) {
         };
     }
 
+    printf("%s\n", decode_buf);
+
     free(encoded_buf);
 
     printf("Encoding used %u bytes. Original string was %u bytes long\n", bits_written/8+((bits_written%32)?1:0)*4, num_chars);
