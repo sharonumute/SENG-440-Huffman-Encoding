@@ -2,6 +2,23 @@
 
 
 /**
+ * Function: ceil_divide
+ * 
+ * Description: Returns the ceiling of num/den. Used to calculate 
+ * the number of data elements int the encoding.
+ * 
+ * Param: (unsgined long int) num: The numerator
+ * 
+ * Param: (unsigned long int) den: The denominator
+ * 
+ * Returns: ceil(num/den)
+ * 
+ */
+inline uint32_t ceil_divide(uint32_t num,uint32_t den) {
+    return (num+den-1)/den;
+}
+
+/**
  * Function: encode_string
  * 
  * Description: Encodes string and writes encoded value to buffer

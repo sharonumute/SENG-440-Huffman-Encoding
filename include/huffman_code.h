@@ -48,22 +48,7 @@
         (byte & 0x00000002 ? '1' : '0'), \
         (byte & 0x00000001 ? '1' : '0')
 
-/**
- * Function: ceil_divide
- * 
- * Description: Returns the ceiling of num/den. Used to calculate 
- * the number of data elements int the encoding.
- * 
- * Param: (unsgined long int) num: The numerator
- * 
- * Param: (unsigned long int) den: The denominator
- * 
- * Returns: ceil(num/den)
- * 
- */
-inline uint32_t ceil_divide(uint32_t num,uint32_t den) {
-    return (num+den-1)/den;
-}
+uint32_t ceil_divide(uint32_t num,uint32_t den);
 
 uint32_t encode_string(
     char string[], 
