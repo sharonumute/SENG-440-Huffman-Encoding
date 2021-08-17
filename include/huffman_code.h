@@ -62,4 +62,10 @@ uint32_t decode_string(
     char out_buf[], 
     register uint32_t out_buf_len);
 
+uint32_t naive_decode_string(
+    uint32_t encoded_string[], 
+    register uint32_t num_encoded_bits, 
+    char out_buf[], 
+    register uint32_t out_buf_len);
+
 #endif

@@ -1,11 +1,11 @@
-#ARM = true
+ARM = true
 #ASSEMBLER_CODE = true
 
 ifeq ($(ARM), true)
 CXX = arm-linux-gcc
-OPTIONS = -g -static -O3 -Werror -Wall -Wextra #-mfloat-abi=softfp
+OPTIONS = -O3 -Werror -Wall -Wextra #-mfloat-abi=softfp
 else
-OPTIONS = -g -O3 -Werror -Wall -Wextra #-fsanitize=address
+OPTIONS = -Ofast -Werror -Wall -Wextra #-fsanitize=address
 CXX = gcc
 endif
 

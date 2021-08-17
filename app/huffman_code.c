@@ -114,11 +114,112 @@ uint32_t encode_string(
  * 
  * Returns: (long long int) The number of bits written or -1 if there was an error
  */
+uint32_t naive_decode_string(
+    uint32_t encoded_string[], 
+    register uint32_t num_encoded_bits, 
+    char out_buf[], 
+    register uint32_t out_buf_len
+)
+{
+
+    // Alphabet ordered from most probable to least
+    const char DECODE_TABLE[ALPHABET_SIZE] = {
+        23, 113, 96, 73, 1, 82, 54, 93, 37, 116, 88, 
+        39, 6, 55, 46, 7, 19, 49, 66, 64, 104, 45, 21, 
+        120, 20, 61, 76, 106, 102, 81, 34, 62, 14, 99, 
+        22, 84, 71, 77, 58, 17, 124, 126, 27, 117, 41, 
+        97, 12, 4, 32, 38, 13, 25, 83, 101, 9, 28, 85, 
+        24, 95, 57, 18, 3, 92, 48, 50, 86, 79, 91, 103, 
+        108, 123, 80, 125, 5, 90, 70, 94, 89, 87, 44, 
+        2, 33, 69, 26, 127, 111, 75, 118, 8, 36, 121, 
+        105, 107, 78, 15, 11, 74, 10, 43, 51, 122, 100, 
+        72, 63, 98, 68, 119, 16, 65, 60, 52, 42, 53, 
+        35, 0, 115, 67, 59, 30, 47, 114, 29, 40, 112, 
+        31, 109, 56, 110
+    };
+
+
+    uint32_t out_buf_index = 0; //Index for writing values to output buffer
+    uint32_t num_1s = 0; //Record the number of 1s for a sequence
+    uint32_t four_bytes = 0; //Value to load into register from encoded sequence
+    int i=0, j=0; //Loop iterators
+    int num_ints_encoded = num_encoded_bits/FOUR_BYTES_SIZE; //Number of full 32 bit integers in encoding
+    //register int bit_value = 0; //Value of a particular bit from encoding
+    //register int bit_value1 = 0; //Second version for loop unrolling
+
+    //Loop for each full 32 bit value in the encoded array
+    for(i=0; i < num_ints_encoded; ++i) {
+        four_bytes = encoded_string[i];
+
+
+        //Iterate from 31 = 0x15 (Num bits-1)
+        //-1 has high bit at 0x20 (loop condition like j!=-1)
+        //Code contains as few branches as possible
+        for(j=0x1F; j>=0; --j) {
+            if(four_bytes&(1<<j)) {
+                ++num_1s;
+            } else {
+                if(out_buf_index == out_buf_len) { //Too long
+                    return 0;
+                }
+                out_buf[out_buf_index] = DECODE_TABLE[num_1s];
+                ++out_buf_index;
+                num_1s = 0;
+            }
+        }
+    }
+
+    //If encoding fits evenly into bytes then return here
+    if(num_encoded_bits%FOUR_BYTES_SIZE == 0) {;
+        return out_buf_index;
+    }
+
+
+    //Last int contains only a certain number of encoded bits,
+    //So need to determine where the end of the encoding is
+    four_bytes = encoded_string[num_ints_encoded];
+
+    int end_bit_cond = 31-(int)(num_encoded_bits%FOUR_BYTES_SIZE);
+
+    for(i = 31; i > end_bit_cond; --i) {
+        if(four_bytes&(1<<i)) {
+            ++num_1s;
+        } else {
+            if(out_buf_index == out_buf_len) { //Too long
+                return 0;
+            }
+            out_buf[out_buf_index] = DECODE_TABLE[num_1s];
+            ++out_buf_index;
+            num_1s ^= num_1s;
+        }
+    }
+
+    //Return the number of deconded values
+    return out_buf_index;
+}
+
+/**
+ * Function: decode_string
+ * 
+ * Description: Descodes string and writes encoded value to buffer
+ * 
+ * Param: [in] (uint32_t []) encoded_string: String to encode not neccessarily 
+ * null terminated as '\0' is a valid part of the alphabet
+ * 
+ * Param: [in] (register unsigned int) string_len: The length of the string to encode
+ * 
+ * Param: [out] (char []) out_buf: Buffer to put encoded values in
+ * 
+ * Param: [out] (register unsigned int out_buf_len): Size of output buffer
+ * 
+ * Returns: (long long int) The number of bits written or -1 if there was an error
+ */
 uint32_t decode_string(
     uint32_t encoded_string[], 
     register uint32_t num_encoded_bits, 
     char out_buf[], 
-    register uint32_t out_buf_len) 
+    register uint32_t out_buf_len
+) 
 {
 
     // Alphabet ordered from most probable to least
@@ -143,8 +244,6 @@ uint32_t decode_string(
     register uint32_t four_bytes = 0; //Value to load into register from encoded sequence
     register int i=0, j=0; //Loop iterators
     register int num_ints_encoded = num_encoded_bits/FOUR_BYTES_SIZE; //Number of full 32 bit integers in encoding
-    register int bit_value = 0; //Value of a particular bit from encoding
-    register int bit_value1 = 0; //Second version for loop unrolling
 
     //Loop for each full 32 bit value in the encoded array
     for(i=0; i < num_ints_encoded; ++i) {
@@ -161,29 +260,27 @@ uint32_t decode_string(
         //-1 has high bit at 0x20 (loop condition like j!=-1)
         //Code contains as few branches as possible
         for(j=0x1F; !(j&0x20); j-=2) {
-            bit_value = (four_bytes>>j)&01;
-            bit_value1 = (four_bytes>>(j-1))&01;
-   
-            //If bit is one, increment num_1s
-            num_1s += bit_value;
 
-            out_buf[out_buf_index] = DECODE_TABLE[num_1s];
-            
-            //Sets to zero if bit is 0, otherwise keep the same 
-            num_1s *= bit_value;
+            if(four_bytes&(01<<j)){
+                ++num_1s;
+            }else{
+                //Get encoding
+                out_buf[out_buf_index] = DECODE_TABLE[num_1s];
+                //Sets to zero if bit is 0, otherwise keep the same 
+                num_1s ^= num_1s;
 
-            //If bit is 0, this is the end of the character,so
-            //Increment the outut buffer index
-            out_buf_index += !bit_value;
+                //If bit is 0, this is the end of the character,so
+                //Increment the outut buffer index
+                ++out_buf_index;
+            }
 
-            //Repeat for loop unrolling
-            num_1s += bit_value1;
-            
-            out_buf[out_buf_index] = DECODE_TABLE[num_1s];
-
-            num_1s *= bit_value1;
-            
-            out_buf_index += !bit_value1;
+            if(four_bytes&(01<<(j-1))){
+                ++num_1s;
+            }else{
+                out_buf[out_buf_index] = DECODE_TABLE[num_1s];
+                num_1s ^= num_1s;
+                ++out_buf_index;
+            }
         }
     }
 
@@ -196,31 +293,30 @@ uint32_t decode_string(
         //-1 has high bit at 0x20 (so loop until j==-1)
         for(j=0x1F; !(j&0x20); j-=2) {
 
-            bit_value = (four_bytes>>j)&01;
-            bit_value1 = (four_bytes>>(j-1))&01;
-
-            num_1s += bit_value;
-
-            if(!bit_value) {
+            if(four_bytes&(01<<j)){
+                ++num_1s;
+            }else{
                 //Buffer full
                 if(out_buf_index == out_buf_len) {
                     return 0;
                 }
+                
                 out_buf[out_buf_index] = DECODE_TABLE[num_1s];
+                num_1s ^= num_1s;
+                ++out_buf_index;
             }
-            num_1s *= bit_value; //Sets to zero if bit is 0, otherwise keep the same    
-            out_buf_index += !bit_value;
 
-            num_1s += bit_value1;
-
-            if(!bit_value1) {
-                if(out_buf_index == out_buf_len) { //Too long
+            if(four_bytes&(01<<(j-1))){
+                ++num_1s;
+            }else{
+                if(out_buf_index == out_buf_len) {
                     return 0;
                 }
+
                 out_buf[out_buf_index] = DECODE_TABLE[num_1s];
+                num_1s ^= num_1s;
+                ++out_buf_index;
             }
-            num_1s *= bit_value1;
-            out_buf_index += !bit_value1;
         }
     }
 

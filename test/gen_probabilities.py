@@ -21,12 +21,13 @@ for i in range(128):
     cum_weights.append(p)
     p /= 2.0
 
-size = 2148514
+size = 100000 
 
 text = random.choices(values, cum_weights, k=size)
 
 print(size)
 for val in text:
-    print(chr(val), end='')
-
+    #print(chr(val), end='') #Average case
+    print(chr(values[127]), end='') #Worst case
+    #print(chr(values[0]), end='') #Best case
 
