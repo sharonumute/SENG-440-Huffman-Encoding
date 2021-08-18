@@ -9,7 +9,7 @@ Authors: Samuel Barrett, Shron Mute
 
 Compiling:
 
-Use Makefiile to run code. Makefile contains two variables "ARM", and "ASSEMBLER_CODE".
+Use Makefiile to run code. Makefile contains two variables "ARM", "EXE_DIR", and "ASSEMBLER_CODE", which can be set on the command line when running the make file
 
 If the arm variable is set to true, the code uses the arm-linux-gcc compiler, with options for compiling it to run on our ARM embedded system. If it is not (i.e. it is set to false, or undefined), then the Makefile compiles using regulat gcc.
 
