@@ -7,30 +7,30 @@
  * Description: Returns the ceiling of num/den. Used to calculate 
  * the number of data elements int the encoding.
  * 
- * Param: (unsgined long int) num: The numerator
+ * Param: [in] (uint32_t) num: The numerator
  * 
- * Param: (unsigned long int) den: The denominator
+ * Param: [in] (uint32_t) den: The denominator
  * 
  * Returns: ceil(num/den)
  * 
  */
-inline uint32_t ceil_divide(uint32_t num,uint32_t den) {
+uint32_t ceil_divide(uint32_t num,uint32_t den) {
     return (num+den-1)/den;
 }
 
 /**
  * Function: encode_string
  * 
- * Description: Encodes string and writes encoded value to buffer
+ * Description: Encodes string and writes encoded value to a buffer
  * 
  * Param: [in] (char []) string: String to encode not neccessarily 
  * null terminated as '\0' is a valid part of the alphabet
  * 
- * Param: [in] (register unsigned int) string_len: The length of the string to encode (including null terminators)
+ * Param: [in] (register uint32_t) string_len: The length of the string to encode (including null terminators)
  * 
  * Param: [out] (char []) out_buf: Buffer to put encoded values in
  * 
- * Param: [out] (register unsigned int out_buf_len): Size of output buffer
+ * Param: [out] (register uint32_t) out_buf_len: Size of output buffer
  * 
  * Returns: (unsigned long long int) The number of bits written or -1 if there was an error
  */
@@ -57,12 +57,12 @@ uint32_t encode_string(
         90, 100, 70, 40, 72, 41, 84
     };
 
-    register uint32_t bits_written = 0;
-    register int32_t num_1s = 0;
-    register uint32_t bit_pos = 0;
-    register uint32_t out_buf_index=0; 
+    register uint32_t bits_written = 0; //Keeps track of number of bits in encoding
+    register int32_t num_1s = 0; //Number of 1s in current character encoding
+    register uint32_t bit_pos = 0; //Current bit position to write to output buffer
+    register uint32_t out_buf_index=0; //Current index to write to output buffer
     register int j  ; //Loop counter
-    register uint32_t i;
+    register uint32_t i; 
 
     out_buf[0] = 0;
 
@@ -81,38 +81,42 @@ uint32_t encode_string(
 
             out_buf[out_buf_index] += (1 << bit_pos);
 
+            //Check if output buffer index needs to be incremented
             if(!bit_pos) { //bit_pos == 0
                 ++out_buf_index;
-                out_buf[out_buf_index] = 0;
+                out_buf[out_buf_index] = 0; //Reset
             }
         }
 
+        //Check if output buffer index needs to be incremented for 0 bit
         if((bits_written + j) % FOUR_BYTES_SIZE == 31) {
             ++out_buf_index;
             out_buf[out_buf_index] = 0;
         }
 
+        // Update bits written for the zero bit at the end of encoding
         bits_written += num_1s;
-        ++bits_written; //For the zero bit at the end
+        ++bits_written;
     }
     return bits_written;
 }
 
+
 /**
- * Function: decode_string
+ * Function: naive_decode_string
  * 
- * Description: Descodes string and writes encoded value to buffer
+ * Description: Descodes string and writes encoded value to buffer using unoptimized code
  * 
  * Param: [in] (uint32_t []) encoded_string: String to encode not neccessarily 
  * null terminated as '\0' is a valid part of the alphabet
  * 
- * Param: [in] (register unsigned int) string_len: The length of the string to encode
+ * Param: [in] (register uint32_t) string_len: The length of the string to encode
  * 
  * Param: [out] (char []) out_buf: Buffer to put encoded values in
  * 
- * Param: [out] (register unsigned int out_buf_len): Size of output buffer
+ * Param: [out] ( register uint32_t) out_buf_len: Size of output buffer
  * 
- * Returns: (long long int) The number of bits written or -1 if there was an error
+ * Returns: (long long int) The number of bits written or 0 if there was an error
  */
 uint32_t naive_decode_string(
     uint32_t encoded_string[], 
@@ -144,8 +148,6 @@ uint32_t naive_decode_string(
     uint32_t four_bytes = 0; //Value to load into register from encoded sequence
     int i=0, j=0; //Loop iterators
     int num_ints_encoded = num_encoded_bits/FOUR_BYTES_SIZE; //Number of full 32 bit integers in encoding
-    //register int bit_value = 0; //Value of a particular bit from encoding
-    //register int bit_value1 = 0; //Second version for loop unrolling
 
     //Loop for each full 32 bit value in the encoded array
     for(i=0; i < num_ints_encoded; ++i) {
@@ -201,18 +203,18 @@ uint32_t naive_decode_string(
 /**
  * Function: decode_string
  * 
- * Description: Descodes string and writes encoded value to buffer
+ * Description: Descodes string and writes encoded value to buffer using optimized code
  * 
  * Param: [in] (uint32_t []) encoded_string: String to encode not neccessarily 
  * null terminated as '\0' is a valid part of the alphabet
  * 
- * Param: [in] (register unsigned int) string_len: The length of the string to encode
+ * Param: [in] (register uint32_t) string_len: The length of the string to encode
  * 
  * Param: [out] (char []) out_buf: Buffer to put encoded values in
  * 
- * Param: [out] (register unsigned int out_buf_len): Size of output buffer
+ * Param: [out] ( register uint32_t) out_buf_len: Size of output buffer
  * 
- * Returns: (long long int) The number of bits written or -1 if there was an error
+ * Returns: (long long int) The number of bits written or 0 if there was an error
  */
 uint32_t decode_string(
     uint32_t encoded_string[], 
@@ -274,6 +276,7 @@ uint32_t decode_string(
                 ++out_buf_index;
             }
 
+            //Loop unrolling
             if(four_bytes&(01<<(j-1))){
                 ++num_1s;
             }else{
