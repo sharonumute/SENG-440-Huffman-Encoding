@@ -64,6 +64,9 @@ int run_test_file(char * fpath, int naive_bool, int io_ratio) {
         return -1;
     }
     
+
+    //Perform 1000 thousand calls to decoder and time how long it takes
+    //Call naive_decode for unoptimized tests
     struct timeval t0, t1;
     if(!naive_bool) {
             gettimeofday(&t0, NULL);
@@ -81,6 +84,7 @@ int run_test_file(char * fpath, int naive_bool, int io_ratio) {
 
     printf("Did %u calls in %.2g seconds\n", i, t1.tv_sec - t0.tv_sec + 1E-6 * (t1.tv_usec - t0.tv_usec));
 
+    //Get number of chars decoded
     if(!naive_bool) {
         num_chars = decode_string(encoded_buf, bits_written, decode_buf, num_chars);
     } else{ 
@@ -93,6 +97,7 @@ int run_test_file(char * fpath, int naive_bool, int io_ratio) {
     }
 
 
+    //Check that decoder actually contains the same data as encoded data
     for(i=0; i < num_chars; ++i) {
         if(fbuf[i] != decode_buf[i]) {
             ++num_mismatches;
@@ -118,17 +123,18 @@ int main() {
     const int NAIVE_DECODE = 1;
     const int OPTIMIZED_DECODE = 0;
 
-    //run_test_file("./test/sample_values.txt", NAIVE_DECODE);
-    //run_test_file("./test/sample_values2.txt", NAIVE_DECODE);
+    //Run test on naive decoder
     run_test_file("./test/average_sample.txt", NAIVE_DECODE, 1);
     run_test_file("./test/best_sample.txt", NAIVE_DECODE, 1);
-    //run_test_file("./test/worst_sample.txt", NAIVE_DECODE, 16);
-    //run_test_file("./test/sample_values3.txt", 1);
 
-    //run_test_file("./test/sample_values.txt", OPTIMIZED_DECODE);
+    //Commented out worst case because it takes a long time
+    //run_test_file("./test/worst_sample.txt", NAIVE_DECODE, 16);
+
+    //Run tests on optimized 
     run_test_file("./test/average_sample.txt", OPTIMIZED_DECODE, 1);
     run_test_file("./test/best_sample.txt", OPTIMIZED_DECODE, 1);
+
     //run_test_file("./test/worst_sample.txt", OPTIMIZED_DECODE, 16);
-    //run_test_file("./test/sample_values3.txt", 0);
+    
     return 0;
 }
