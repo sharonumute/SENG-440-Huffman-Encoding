@@ -38,7 +38,7 @@ $(EXE_DIR)/main.s: create_tmp_dir $(EXE_DIR)/lib_huffman_code.a
 	$(CXX) -c src/main.c -S -o $(EXE_DIR)/main.s $(OPTIONS)
 
 $(EXE_DIR)/main: $(EXE_DIR)/main.o $(EXE_DIR)/lib_huffman_code.a create_tmp_dir
-	$(CXX) -o $(EXE_DIR)/main $(EXE_DIR)/main.o -L./$(EXE_DIR) -l_huffman_code $(OPTIONS)
+	$(CXX) -o $(EXE_DIR)/main $(EXE_DIR)/main.o -L$(EXE_DIR) -l_huffman_code $(OPTIONS)
 
 clean:
 	rm -f $(EXE_DIR)/*.a $(EXE_DIR)/*.o $(EXE_DIR)/main
