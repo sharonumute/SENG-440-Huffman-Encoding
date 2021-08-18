@@ -1,3 +1,7 @@
+/**
+ * Seng 440 Huffman Code project
+ * Authors: Samuel Barrett, Sharon Mute
+ */
 #include "../include/huffman_code.h"
 
 

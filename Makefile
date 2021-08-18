@@ -1,5 +1,7 @@
+#These variables can be set via the command line
 ARM = true
-#ASSEMBLER_CODE = true
+ASSEMBLER_CODE = false 
+EXE_DIR = tmp
 
 ifeq ($(ARM), true)
 CXX = arm-linux-gcc
@@ -9,7 +11,6 @@ OPTIONS = -Ofast -Werror -Wall -Wextra #-fsanitize=address
 CXX = gcc
 endif
 
-EXE_DIR = tmp
 
 
 ifeq ($(ASSEMBLER_CODE), true)
@@ -34,7 +35,7 @@ $(EXE_DIR)/main.o: create_tmp_dir
 	$(CXX) -c src/main.c -o $(EXE_DIR)/main.o $(OPTIONS)
 
 $(EXE_DIR)/main.s: create_tmp_dir $(EXE_DIR)/lib_huffman_code.a
-	$(CXX) -c src/main.c -S -o $(EXE_DIR)/main.s $(OPTIONS)s
+	$(CXX) -c src/main.c -S -o $(EXE_DIR)/main.s $(OPTIONS)
 
 $(EXE_DIR)/main: $(EXE_DIR)/main.o $(EXE_DIR)/lib_huffman_code.a create_tmp_dir
 	$(CXX) -o $(EXE_DIR)/main $(EXE_DIR)/main.o -L./$(EXE_DIR) -l_huffman_code $(OPTIONS)
